@@ -1,0 +1,81 @@
+
+import numpy as np 
+import skfuzzy as fuzz 
+import matplotlib.pyplot as plt  
+netlikderecesi = np.arange(0, 7,0.5) 
+uzaklýkmesafesi = np.arange(0, 4, 1) 
+gozsaglýgý  = np.arange(0, 11, 1)  
+NDY = fuzz.trimf(netlikderecesi, [0, 0, 2]) 
+NDO = fuzz.trimf(netlikderecesi, [0, 2, 5]) 
+NDD = fuzz.trimf(netlikderecesi, [5, 7, 7])  
+UMY = fuzz.trimf(uzaklýkmesafesi, [0, 0, 1]) 
+UMO = fuzz.trimf(uzaklýkmesafesi, [0, 1, 2]) 
+UMD = fuzz.trimf(uzaklýkmesafesi, [2, 3, 3])  
+GSCD = fuzz.trimf(gozsaglýgý, [0, 0, 5]) 
+GSD = fuzz.trimf(gozsaglýgý, [20, 35, 50]) 
+GSO = fuzz.trimf(gozsaglýgý, [40, 55, 70]) 
+GSY = fuzz.trimf(gozsaglýgý, [60, 70, 80]) 
+GSCY = fuzz.trimf(gozsaglýgý, [70, 100, 100])   
+fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, figsize=(8, 9)) 
+ 
+ax0.plot(netlikderecesi, NDD, 'b', linewidth=1.5, label='NDD = Netlik derecesi Kötü') 
+ax0.plot(netlikderecesi, NDO, 'g', linewidth=1.5, label='NDO = Netlik derecesi Orta') 
+ax0.plot(netlikderecesi, NDY, 'r', linewidth=1.5, label='NDY = Netlik derecesi Ýyi') 
+ax0.set_title('Netlik Derecesi') 
+ax0.legend()  
+ax1.plot(uzaklýkmesafesi, UMD, 'b', linewidth=1.5, label='UMD =Uzaklýkmesafesi Düþük') 
+ax1.plot(uzaklýkmesafesi, UMO,'g', linewidth=1.5, label='UMO =Uzaklýkmesafesi Orta') 
+ax1.plot(uzaklýkmesafesi, UMY, 'r', linewidth=1.5, label='UMY =Uzaklýkmesafesi Yüksek') 
+ax1.set_title('Uzaklýk Mesafesi') 
+ax1.legend()  
+ax2.plot(gozsaglýgý, GSCD, 'b', linewidth=1.5, label='GSCD = gozsaglýgý çok düþük') 
+ax2.plot(gozsaglýgý, GSD, 'g',  linewidth=1.5, label='GSD  = gozsaglýgý düþük') 
+ax2.plot(gozsaglýgý, GSO, 'r',  linewidth=1.5, label='GSO  = gozsaglýgý orta') 
+ax2.plot(gozsaglýgý, GSY, 'm',  linewidth=1.5, label='GSY = gozsaglýgý yüksek ') 
+ax2.plot(gozsaglýgý, GSCY, 'y', linewidth=1.5, label='GSCY =gozsaglýgý Çok yüksek') 
+ax2.set_title('gozsaglýgý') 
+ax2.legend()   
+for ax in (ax0, ax1, ax2): 
+    ax.spines['top'].set_visible(False) 
+    ax.spines['right'].set_visible(False) 
+    ax.get_xaxis().tick_bottom() 
+    ax.get_yaxis().tick_left()  
+plt.tight_layout()  
+#kullanýcý giriþleri 
+netlik_derecesi = input('Netlik derecesini 0 ile 7 deðerleri arasýnda oylayýnýz!!!!!!') 
+uzaklýk_mesafesi = input('uzaklýk mesafesini 0 ile 3 deðerleri arasýnda oylayýnýz!!!!')   
+netlikderecesi_kotu = fuzz.interp_membership(netlikderecesi, NDK, float(netlik_derecesi)) 
+netlikderecesi_orta = fuzz.interp_membership(netlikderecesi, NDO, float(netlik_derecesi)) 
+netlikderecesi_iyi = fuzz.interp_membership(netlikderecesi, NDI, float(netlik_derecesi))  
+uzaklýkmesafesi_düsük = fuzz.interp_membership(uzaklýkmesafesi, UMD, float(uzaklýk_mesafesi)) 
+uzaklýkmesafesi_orta = fuzz.interp_membership(uzaklýkmesafesi, UMO, float(uzaklýk_mesafesi)) 
+uzaklýkmesafesi_yüksek = fuzz.interp_membership(uzaklýkmesafesi, UMY, float(uzaklýk_mesafesi))  
+#Kurallar uygulanýyor 
+#kural 1 
+Kural1 = np.fmin(netlikderecesi_kotu,uzaklýkmesafesi_dusuk) 
+Kontrol_kural1 = np.fmin(Kural1,GSÇA) 
+#kural 2 
+Kural2 = np.fmin(netlikderecesi_kotu,uzaklýkmesafesi_orta) 
+Kontrol_kural2 = np.fmin(Kural2,GSA) 
+#kural 3 
+Kural3 = np.fmin(netlikderecesi_orta,uzaklýkmesafesi_orta) 
+Kontrol_kural3 = np.fmin(Kural3,GSO) 
+#kural 4 
+Kural4 = np.fmin(netlikderecesi_orta,uzaklýkmesafesi_yüksek) 
+Kontrol_kural4 = np.fmin(Kural4,GSI) 
+#kural 5 
+Kural5 = np.fmin(netlikderecesi_iyi,uzaklýkmesafesi_dusuk) 
+Kontrol_kural5 = np.fmin(Kural5,GSO) 
+#kural 6 
+Kural6 = np.fmin(netlikderecesi_iyi,uzaklýkmesafesi_yuksek) 
+Kontrol_kural6 = np.fmin(Kural6,GSCI) 
+ 
+ctr0 = np.zeros_like(gozsaglýgý)  
+c1 = np.fmax(Kontrol_kural1,Kontrol_kural2) 
+c2 = np.fmax(Kontrol_kural3,Kontrol_kural4) 
+c3 = np.fmax(Kontrol_kural5,Kontrol_kural6) 
+c4 = np.fmax(c2,c3) 
+toplanan_kurallar = np.fmax(c1,c4) 
+durulama_islemi = fuzz.defuzz(gozsaglýgý, toplanan_kurallar, 'lom') 
+islem_sonucu = fuzz.interp_membership(gozsaglýgý,toplanan_kurallar,durulama_islemi) 
+print ("gozsaglýgý = " , durulama_islemi , " düzeyi")       
